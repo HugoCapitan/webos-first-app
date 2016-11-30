@@ -1,6 +1,12 @@
+var Collection = require('enyo/Collection');
+var dataFile = require('../data/data');
 var kind = require('enyo/kind');
-var Panels = require('moonstone/Panels');
+
+var DataGridList = require('moonstone/DataGridList');
+var GridListImageItem = require('moonstone/GridListImageItem');
 var Panel = require('moonstone/Panel');
+var Panels = require('moonstone/Panels');
+
 
 var SearchPanel = kind({
   name: 'SearchPanel',
@@ -11,8 +17,23 @@ var SearchPanel = kind({
   handlers: {
     onInputHeaderChange: 'search'
   },
+  components: [
+    {kind: DataGridList, fit: true, name: 'resultList', minWidth: 250, minHeight: 300, components: [
+      {kind: GridListImageItem, imageSizing: 'cover', useSubCaption: false, centered: false, bindings: [
+        {from: 'model.title', to: 'caption'},
+        {from: 'model.thumbnail', to: 'source'}
+      ]}
+    ]}
+  ],
+  bindings: [
+    {from: 'photos', to: '$.resultList.collection'}
+  ],
+  create: function (){
+    this.inherited(arguments);
+    this.set('photos', new dataFile.SearchCollection());
+  },
   search: function (sender, ev) {
-    alert(ev.originator.get('value'));
+    this.$.resultList.collection.set('searchText', ev.originator.get('value'));
   }
 });
 
